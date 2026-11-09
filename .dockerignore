@@ -1,0 +1,12 @@
+data/
+events/
+notebooks/
+docs/
+.git/
+.github/
+scripts/
+*.md
+*.log
+.env
+.ipynb_checkpoints/
+__pycache__/

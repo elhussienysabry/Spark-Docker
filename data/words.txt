@@ -1,0 +1,13 @@
+Apache Spark is a unified analytics engine for large-scale data processing.
+It provides high-level APIs in Scala, Java, Python, and R, and an optimized
+engine that supports general execution graphs. Spark also supports a rich set
+of higher-level tools including Spark SQL for SQL and structured data
+processing, pandas API on Spark, MLlib for machine learning, GraphX for graph
+processing, and Structured Streaming for incremental computation.
+
+Spark runs on Hadoop, Apache Mesos, Kubernetes, standalone, or in the cloud.
+This Docker setup uses Spark's standalone cluster mode with one master and two
+workers, plus JupyterLab for interactive PySpark notebooks. The History Server
+keeps completed application UIs available after the driver exits.
+
+Spark is fast. Spark is general purpose. Spark is open source.

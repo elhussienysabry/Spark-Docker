@@ -1,0 +1,47 @@
+# syntax=docker/dockerfile:1
+
+# Apache Spark 4.2.1 on Python 3.13.
+#
+# The official apache/spark image is Ubuntu 22.04 with Python 3.10, while the
+# JupyterLab image uses Python 3.13. PySpark refuses to run UDFs when the
+# driver and workers use different Python minor versions, so this image keeps
+# the official Spark distribution but swaps in a Python 3.13 base.
+#
+# The Spark distribution is copied from the official image; only the runtime
+# Python changes. pandas/pyarrow/numpy are included for executor-side UDFs.
+
+FROM eclipse-temurin:21-jre-jammy AS jre
+
+FROM python:3.13-slim-bookworm
+
+COPY --from=jre /opt/java/openjdk /opt/java/openjdk
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+COPY --from=apache/spark:4.2.1 /opt/spark /opt/spark
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends passwd procps; \
+    rm -rf /var/lib/apt/lists/*; \
+    groupadd --gid 185 spark; \
+    useradd --uid 185 --gid 185 --system --home-dir /nonexistent \
+            --shell /usr/sbin/nologin spark; \
+    mkdir -p /opt/spark/work /opt/spark/logs; \
+    chown -R spark:spark /opt/spark; \
+    pip install --no-cache-dir \
+        pandas==2.3.3 \
+        pyarrow==25.0.0 \
+        numpy==2.5.4
+
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV PYSPARK_PYTHON=python3
+
+# Add extra executor-side libraries here, before switching to the unprivileged user:
+# RUN pip install --no-cache-dir scikit-learn
+
+USER spark
+WORKDIR /opt/spark/work-dir
+
+# No ENTRYPOINT: Compose passes the full spark-class command.
