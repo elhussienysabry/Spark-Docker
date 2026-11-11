@@ -9,7 +9,7 @@
 ### What is Apache Spark Learning Lab?
 The **Apache Spark Learning Lab** is an interactive, fully configured, multi-node distributed engineering environment designed to take learners from absolute zero to advanced production-level Apache Spark mastery.
 
-Instead of running toy snippets in single-threaded Python scripts or disconnected cloud sandboxes, this repository provides a real distributed Apache Spark cluster running in Docker. You interact with the cluster through 76 structured Jupyter notebooks, run distributed queries across independent worker containers, inspect memory spills and shuffle files on disk, analyze stage DAGs in the live Spark Web UI, and review completed jobs in the Spark History Server.
+Instead of running toy snippets in single-threaded Python scripts or disconnected cloud sandboxes, this repository provides a real distributed Apache Spark cluster running in Docker. You interact with the cluster through 82 Jupyter notebooks: 76 core curriculum notebooks, four end-to-end business case studies, and two supplementary quickstarts. Run distributed queries across independent worker containers, inspect memory spills and shuffle files on disk, analyze stage DAGs in the live Spark Web UI, and review completed jobs in the Spark History Server.
 
 ### Why Does This Project Exist?
 Most Apache Spark tutorials suffer from three fundamental problems:
@@ -204,6 +204,10 @@ Spark-Docker/
 ├── conf/
 │   └── spark-defaults.conf
 ├── data/
+│   ├── case_studies/
+│   │   ├── fraud/
+│   │   ├── logistics/
+│   │   └── telecom/
 │   ├── logs/
 │   │   └── access.log
 │   ├── quality/
@@ -218,6 +222,7 @@ Spark-Docker/
 │   ├── processed/
 │   ├── raw/
 │   ├── sample/
+│   ├── generate_case_studies.py
 │   ├── generate_datasets.py
 │   ├── sales.csv
 │   └── words.txt
@@ -228,14 +233,20 @@ Spark-Docker/
 │   ├── 03-jupyter.md
 │   ├── 04-operations.md
 │   ├── 05-troubleshooting.md
+│   ├── AUDIT_AND_IMPROVEMENT_PLAN.md
+│   ├── BUSINESS_CONTEXT.md
+│   ├── CASE_STUDIES.md
 │   ├── COMMON_MISTAKES.md
 │   ├── EXPERIMENTS_GUIDE.md
 │   ├── GLOSSARY.md
 │   ├── INTERVIEW_PREPARATION.md
 │   ├── LEARNING_ROADMAP.md
+│   ├── NOTEBOOK_TEMPLATE.md
 │   ├── PRIORITY_GUIDE.md
 │   ├── PRODUCTION_CHECKLIST.md
-│   └── SPARK_ARCHITECTURE.md
+│   ├── SPARK_ARCHITECTURE.md
+│   ├── TOPIC_INDEX.md
+│   └── USE_CASES.md
 ├── events/
 │   └── .gitkeep
 ├── notebooks/
@@ -324,13 +335,22 @@ Spark-Docker/
 │   │   ├── 04_resource_allocation.ipynb
 │   │   ├── 05_spark_connect.ipynb
 │   │   └── 06_pyspark_internals.ipynb
-│   └── 13_end_to_end_projects/
-│       ├── 01_batch_etl_pipeline.ipynb
-│       ├── 02_large_scale_sales_analytics.ipynb
-│       ├── 03_data_quality_pipeline.ipynb
-│       └── 04_streaming_analytics_pipeline.ipynb
+│   ├── 13_end_to_end_projects/
+│   │   ├── 01_batch_etl_pipeline.ipynb
+│   │   ├── 02_large_scale_sales_analytics.ipynb
+│   │   ├── 03_data_quality_pipeline.ipynb
+│   │   └── 04_streaming_analytics_pipeline.ipynb
+│   └── 14_business_case_studies/
+│       ├── 01_ecommerce_analytics.ipynb
+│       ├── 02_telecom_network_analytics.ipynb
+│       ├── 03_financial_fraud_patterns.ipynb
+│       └── 04_logistics_delivery_analytics.ipynb
 ├── scripts/
 │   ├── validate_notebooks.py
+│   ├── check_links.py
+│   ├── generate_case_studies.py
+│   ├── generate_navigation_docs.py
+│   ├── curriculum_metadata.py
 │   ├── remove_emojis.py
 │   ├── nb_utils.py
 │   └── gen_*.py
@@ -349,9 +369,13 @@ Spark-Docker/
 
 ---
 
-## 7. Complete Curriculum Roadmap (76 Notebooks)
+## 7. Complete Curriculum Roadmap (82 Notebooks)
 
-The curriculum is structured into 14 progressive modules. Every notebook follows a standardized 7-part pedagogical structure: Conceptual Foundation, Architecture & Internals, Production Scenario, Hands-on Code Lab, Spark UI Diagnostics, Practical Exercises, and Key Takeaways.
+The curriculum is structured into 15 progressive modules: 76 core topic notebooks, four
+end-to-end business case studies, and two supplementary quickstart notebooks. Core topic
+notebooks follow the A–L structure: objectives, motivation, concepts, internals,
+implementation, use cases, business value, production guidance, trade-offs, experiments,
+exercises, and summary.
 
 | Module | Directory | Topics Covered | Notebook Count |
 | :--- | :--- | :--- | :--- |
@@ -369,7 +393,13 @@ The curriculum is structured into 14 progressive modules. Every notebook follows
 | **11** | `11_fault_tolerance_and_reliability/` | Lineage recomputation, executor crash simulation, task retry mechanisms, RDD checkpoints, chaos experiments | 5 |
 | **12** | `12_advanced_topics/` | Spark on YARN, Spark on Kubernetes, client vs cluster modes, dynamic resource allocation, Spark Connect | 6 |
 | **13** | `13_end_to_end_projects/` | Batch ETL pipeline, large-scale sales analytics, automated data quality framework, real-time streaming pipeline | 4 |
-| **Total** | | **Comprehensive Apache Spark Engineering Curriculum** | **76 Notebooks** |
+| **14** | `14_business_case_studies/` | E-commerce revenue and retention, telecom network quality, financial fraud patterns, logistics delivery performance | 4 |
+| **Total** | | **76 core topics + 4 case studies = 80 curriculum notebooks** | **80** |
+
+The two root-level notebooks (`00_spark_quickstart.ipynb` and `01_spark.ipynb`) are
+supplementary: a fast smoke test and a scratch pad. They are not counted in the 80
+curriculum notebooks. Total learning notebooks: 82. An additional reusable template lives
+in `notebooks/templates/00_topic_template.ipynb`.
 
 ---
 
@@ -379,14 +409,19 @@ The `docs/` directory provides comprehensive, production-grade technical referen
 
 | Document | Description |
 | :--- | :--- |
+| **[`docs/CASE_STUDIES.md`](docs/CASE_STUDIES.md)** | Index and engineering notes for the four runnable case studies: business context, schemas, architecture, expected results, production guidance, and caveats. |
+| **[`docs/BUSINESS_CONTEXT.md`](docs/BUSINESS_CONTEXT.md)** | How Spark fits into a modern data stack: batch vs streaming, architecture patterns, economics, quality, reliability, security, and when another tool is a better fit. |
+| **[`docs/USE_CASES.md`](docs/USE_CASES.md)** | Topic-specific real-world scenarios for every core notebook, with business decisions, Spark mechanisms, and trade-offs. |
+| **[`docs/TOPIC_INDEX.md`](docs/TOPIC_INDEX.md)** | Navigation index with priority, effort, prerequisites, experiments, and role paths for all 76 core topics. |
 | **[`docs/LEARNING_ROADMAP.md`](docs/LEARNING_ROADMAP.md)** | Structured 12-week learning path from novice to senior distributed data engineer, including weekly milestones and self-assessment criteria. |
 | **[`docs/PRIORITY_GUIDE.md`](docs/PRIORITY_GUIDE.md)** | Engineering priority matrix ranking Spark concepts by daily production relevance, interview frequency, and mastery difficulty. |
 | **[`docs/SPARK_ARCHITECTURE.md`](docs/SPARK_ARCHITECTURE.md)** | Exhaustive architectural manual detailing memory layouts, execution lifecycles, network RPCs, shuffle mechanics, and internal schedulers. |
-| **[`docs/INTERVIEW_PREPARATION.md`](docs/INTERVIEW_PREPARATION.md)** | 158 technical interview questions categorized across Junior, Mid, Senior, and Staff engineering levels with rigorous model answers. |
-| **[`docs/COMMON_MISTAKES.md`](docs/COMMON_MISTAKES.md)** | Catalog of 15 classic production antipatterns (`count()` abuse, small files, accidental shuffles, Cartesian joins) with code before/after fixes. |
-| **[`docs/GLOSSARY.md`](docs/GLOSSARY.md)** | 70+ precisely defined terms covering Spark internals, distributed systems theory, and JVM memory mechanics. |
-| **[`docs/EXPERIMENTS_GUIDE.md`](docs/EXPERIMENTS_GUIDE.md)** | Catalog of 25+ empirical experiments designed to trigger memory spills, task retries, data skew, and shuffle bottlenecks under controlled conditions. |
+| **[`docs/INTERVIEW_PREPARATION.md`](docs/INTERVIEW_PREPARATION.md)** | Technical interview questions categorized across Junior, Mid, Senior, and Staff engineering levels with rigorous model answers. |
+| **[`docs/COMMON_MISTAKES.md`](docs/COMMON_MISTAKES.md)** | Catalog of classic production antipatterns (`count()` abuse, small files, accidental shuffles, Cartesian joins) with code before/after fixes. |
+| **[`docs/GLOSSARY.md`](docs/GLOSSARY.md)** | Precisely defined terms covering Spark internals, distributed systems theory, and JVM memory mechanics. |
+| **[`docs/EXPERIMENTS_GUIDE.md`](docs/EXPERIMENTS_GUIDE.md)** | Catalog of empirical experiments designed to trigger memory spills, task retries, data skew, and shuffle bottlenecks under controlled conditions. |
 | **[`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md)** | Production deployment readiness checklist covering cluster sizing, storage layouts, shuffle configs, memory ratios, and streaming operations. |
+| **[`docs/NOTEBOOK_TEMPLATE.md`](docs/NOTEBOOK_TEMPLATE.md)** | The A–L notebook structure and quality checklist used by the curriculum. |
 
 ---
 
@@ -405,8 +440,13 @@ The `./data` directory is mounted into all cluster containers at `/opt/spark-dat
 | `/opt/spark-data/sales.csv` | CSV | 49 rows | Compact order dataset for rapid testing and quickstart demos |
 | `/opt/spark-data/words.txt` | Text | 13 lines | Classic text file for distributed word-count tutorials |
 | `/opt/spark-data/streaming/events/` | Text/JSON | Dynamic | File stream landing directory for structured streaming ingestion |
+| `/opt/spark-data/case_studies/telecom/` | CSV | 36,008 rows | Eight towers and one week of synthetic voice, SMS, and data events |
+| `/opt/spark-data/case_studies/fraud/` | CSV | 30,012 rows | Synthetic card transactions and merchants, including 600 labelled frauds |
+| `/opt/spark-data/case_studies/logistics/` | CSV | 20,010 rows | Ten hubs and two months of synthetic shipments across four carriers |
 
-To regenerate or scale these datasets, run `python3 data/generate_datasets.py`.
+Regenerate the core datasets with `python3 data/generate_datasets.py`. Regenerate the
+case-study data with `python3 data/generate_case_studies.py`. Both generators are
+deterministic.
 
 ---
 
@@ -468,6 +508,7 @@ make logs          # Follow live cluster container logs
 make pyspark       # Launch interactive PySpark REPL connected to the cluster
 make sql           # Launch interactive Spark SQL shell
 make test          # Run sample batch jobs (Pi, WordCount, Sales)
+make validate      # Validate notebook JSON/AST and local Markdown links
 make clean-output  # Clean generated warehouse outputs and event logs
 ```
 
@@ -482,9 +523,23 @@ python3 scripts/validate_notebooks.py
 ```
 
 This validates:
-- Complete JSON formatting integrity across all 76 notebooks.
-- Abstract Syntax Tree (AST) validation of every Python code cell.
-- Detection of syntax errors, unclosed strings, or broken imports.
+- JSON structure and required notebook fields across 83 notebook files (82 learning
+  notebooks plus one template).
+- Abstract Syntax Tree (AST) parsing of every Python code cell, including case studies.
+- Cell metadata sanity and stored error outputs.
+
+The validator is repository-relative, so it works on a CI runner without a hard-coded
+local path. Run the standalone link checker for README, docs, and notebook Markdown links:
+
+```bash
+python3 scripts/check_links.py
+```
+
+Docker Compose configuration is validated separately:
+
+```bash
+docker compose config
+```
 
 ---
 

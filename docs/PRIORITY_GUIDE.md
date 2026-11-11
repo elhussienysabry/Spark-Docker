@@ -11,7 +11,7 @@
 Not all Spark concepts carry equal weight in day-to-day engineering or technical interviews. Spending forty hours mastering RDD low-level byte serialization before understanding DataFrame partition pruning is a misallocation of effort.
 
 This guide provides an uncompromising, role-specific roadmap detailing:
-- **Priority Level**: Critical (), High (), Medium (), Low ()
+- **Priority Level**: Critical, High, Medium, Low
 - **Required Depth**: Surface, Working Knowledge, Deep Internals, System Architect
 - **What You Must Understand**: Fundamental theory and mental models
 - **What You Should Implement**: Hands-on code and debugging patterns
@@ -24,29 +24,29 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 
 | Topic Area | Data Engineer | Sr. Data Engineer | Analytics Engineer | Platform / Infra Engineer |
 | :--- | :---: | :---: | :---: | :---: |
-| **Spark Architecture & Lifecycle** |  Critical |  Critical |  Medium |  Critical |
-| **RDD Low-Level Fundamentals** |  Medium |  High |  Low |  High |
-| **DataFrame & Spark SQL API** |  Critical |  Critical |  Critical |  Medium |
-| **Lazy Evaluation & DAG** |  Critical |  Critical |  High |  Critical |
-| **Narrow vs. Wide Dependencies** |  Critical |  Critical |  Medium |  Critical |
-| **Partitions & Coalesce vs Repartition** |  Critical |  Critical |  High |  Critical |
-| **Shuffle Internals & Spilling** |  Critical |  Critical |  Medium |  Critical |
-| **Memory Architecture (Unified Memory)** |  High |  Critical |  Low |  Critical |
-| **Cache & Persist Storage Levels** |  Critical |  Critical |  Medium |  High |
-| **Catalyst Optimizer & Plans** |  High |  Critical |  Medium |  High |
-| **Tungsten & Whole-Stage Codegen** |  Medium |  High |  Low |  High |
-| **Adaptive Query Execution (AQE)** |  High |  Critical |  Medium |  Critical |
-| **Join Strategies (Broadcast, SMJ, SHJ)**|  Critical |  Critical |  High |  High |
-| **Window Functions & Analytics** |  Critical |  Critical |  Critical |  Low |
-| **Data Quality & Dirty Record Handling**|  Critical |  Critical |  Critical |  Low |
-| **Python UDFs vs. Pandas / Vectorized** |  Critical |  Critical |  Medium |  Medium |
-| **File Formats & Data Lake Layouts** |  Critical |  Critical |  High |  High |
-| **Structured Streaming & Watermarks** |  High |  Critical |  Medium |  High |
-| **Fault Tolerance & Lineage Recomputation**|  High |  Critical |  Low |  Critical |
-| **Data Skew Detection & Remediation** |  Critical |  Critical |  Medium |  Critical |
-| **Spark UI & Event Log Diagnostics** |  Critical |  Critical |  Medium |  Critical |
-| **Cluster Modes (Client vs Cluster)** |  High |  Critical |  Low |  Critical |
-| **Spark Connect Architecture** |  Medium |  High |  Medium |  High |
+| **Spark Architecture & Lifecycle** | Critical | Critical | Medium | Critical |
+| **RDD Low-Level Fundamentals** | Medium | High | Low | High |
+| **DataFrame & Spark SQL API** | Critical | Critical | Critical | Medium |
+| **Lazy Evaluation & DAG** | Critical | Critical | High | Critical |
+| **Narrow vs. Wide Dependencies** | Critical | Critical | Medium | Critical |
+| **Partitions & Coalesce vs Repartition** | Critical | Critical | High | Critical |
+| **Shuffle Internals & Spilling** | Critical | Critical | Medium | Critical |
+| **Memory Architecture (Unified Memory)** | High | Critical | Low | Critical |
+| **Cache & Persist Storage Levels** | Critical | Critical | Medium | High |
+| **Catalyst Optimizer & Plans** | High | Critical | Medium | High |
+| **Tungsten & Whole-Stage Codegen** | Medium | High | Low | High |
+| **Adaptive Query Execution (AQE)** | High | Critical | Medium | Critical |
+| **Join Strategies (Broadcast, SMJ, SHJ)**| Critical | Critical | High | High |
+| **Window Functions & Analytics** | Critical | Critical | Critical | Low |
+| **Data Quality & Dirty Record Handling**| Critical | Critical | Critical | Low |
+| **Python UDFs vs. Pandas / Vectorized** | Critical | Critical | Medium | Medium |
+| **File Formats & Data Lake Layouts** | Critical | Critical | High | High |
+| **Structured Streaming & Watermarks** | High | Critical | Medium | High |
+| **Fault Tolerance & Lineage Recomputation**| High | Critical | Low | Critical |
+| **Data Skew Detection & Remediation** | Critical | Critical | Medium | Critical |
+| **Spark UI & Event Log Diagnostics** | Critical | Critical | Medium | Critical |
+| **Cluster Modes (Client vs Cluster)** | High | Critical | Low | Critical |
+| **Spark Connect Architecture** | Medium | High | Medium | High |
 
 ---
 
@@ -55,7 +55,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 1. Spark Architecture & Application Lifecycle
-- **Priority**:  Critical (DE, Sr. DE, Platform) ·  Medium (AE)
+- **Priority**: Critical (DE, Sr. DE, Platform) · Medium (AE)
 - **Required Depth**: Deep Internals
 - **What You MUST Understand**:
   - The distinct separation between the **Driver** (orchestrator) and **Executors** (workers).
@@ -79,7 +79,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 2. Lazy Evaluation & The Execution Graph (DAG)
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Deep Understanding
 - **What You MUST Understand**:
   - Spark does not touch disk or execute compute when a transformation (`select`, `filter`, `map`) is declared.
@@ -99,7 +99,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 3. Jobs, Stages, Tasks, and Stage Boundaries
-- **Priority**:  Critical (DE, Sr. DE, Platform)
+- **Priority**: Critical (DE, Sr. DE, Platform)
 - **Required Depth**: Deep Internals
 - **What You MUST Understand**:
   - **Job**: 1:1 correspondence with an Action.
@@ -122,7 +122,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 4. Narrow vs. Wide Dependencies
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Deep Understanding
 - **What You MUST Understand**:
   - **Narrow Dependency**: Each partition of the parent RDD is used by at most one partition of the child RDD (e.g., `map`, `filter`, `union`, `coalesce` down). Can execute in parallel within the same thread without network transfer.
@@ -141,7 +141,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 5. Partitions & Partition Management (`repartition` vs `coalesce`)
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Working Knowledge to Deep Internals
 - **What You MUST Understand**:
   - Partitions dictate degree of parallelism. 4 cores with 1 partition = 3 cores idle. 4 cores with 10,000 tiny partitions = overwhelming task scheduling overhead.
@@ -165,7 +165,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 6. Shuffle Internals & Disk Spilling
-- **Priority**:  Critical (DE, Sr. DE, Platform)
+- **Priority**: Critical (DE, Sr. DE, Platform)
 - **Required Depth**: Deep Internals
 - **What You MUST Understand**:
   - The shuffle lifecycle:
@@ -189,7 +189,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 7. Unified Memory Architecture & Executor Sizing
-- **Priority**:  Critical (Sr. DE, Platform) ·  High (DE)
+- **Priority**: Critical (Sr. DE, Platform) · High (DE)
 - **Required Depth**: Deep Internals
 - **What You MUST Understand**:
   - Total Executor Memory Breakdown:
@@ -215,7 +215,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 8. Caching and Persistence Strategies
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Working Knowledge to Deep Internals
 - **What You MUST Understand**:
   - `cache()` is an alias for `persist(StorageLevel.MEMORY_AND_DISK)` on DataFrames (note: in RDDs it was `MEMORY_ONLY`).
@@ -241,7 +241,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 9. Join Strategies & Optimizations
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Deep Internals
 - **What You MUST Understand**:
   - **Broadcast Hash Join (BHJ)**:
@@ -272,7 +272,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 10. Catalyst Optimizer & Query Execution Plans
-- **Priority**:  Critical (Sr. DE) ·  High (DE) ·  Medium (AE)
+- **Priority**: Critical (Sr. DE) · High (DE) · Medium (AE)
 - **Required Depth**: Deep Understanding
 - **What You MUST Understand**:
   - The 4 Phases of Catalyst:
@@ -295,7 +295,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 11. Adaptive Query Execution (AQE)
-- **Priority**:  Critical (Sr. DE, Platform) ·  High (DE)
+- **Priority**: Critical (Sr. DE, Platform) · High (DE)
 - **Required Depth**: Deep Understanding
 - **What You MUST Understand**:
   - Prior to AQE, Spark optimized queries statically before execution began.
@@ -317,7 +317,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 12. Data Skew Detection and Remediation
-- **Priority**:  Critical (DE, Sr. DE)
+- **Priority**: Critical (DE, Sr. DE)
 - **Required Depth**: Deep Understanding & Implementation
 - **What You MUST Understand**:
   - Definition: When a few partitions contain drastically more data than others due to uneven key distribution (e.g., `null` keys, popular category IDs).
@@ -341,7 +341,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 13. Spark UI Diagnostics & Performance Triage
-- **Priority**:  Critical (All Roles)
+- **Priority**: Critical (All Roles)
 - **Required Depth**: Expert Level
 - **What You MUST Understand**:
   - Every performance issue leaves a fingerprint in the Spark UI:
@@ -365,7 +365,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 14. Fault Tolerance, Lineage, and Task Retries
-- **Priority**:  High (DE, Sr. DE) ·  Critical (Platform)
+- **Priority**: High (DE, Sr. DE) · Critical (Platform)
 - **Required Depth**: Deep Understanding
 - **What You MUST Understand**:
   - Spark achieves fault tolerance through **Lineage (recomputation)** rather than data replication across network nodes (unlike HDFS).
@@ -390,7 +390,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 ---
 
 ### 15. Structured Streaming & Exactly-Once Semantics
-- **Priority**:  High (DE) ·  Critical (Sr. DE) ·  Medium (AE)
+- **Priority**: High (DE) · Critical (Sr. DE) · Medium (AE)
 - **Required Depth**: Working Knowledge to Deep Internals
 - **What You MUST Understand**:
   - The mental model: Treat a live stream as an **Unbounded Append-Only Table**.
