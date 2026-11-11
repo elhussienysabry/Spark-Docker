@@ -1,0 +1,13 @@
+merchant_id,merchant_name,category,risk_tier,country
+M-001,Nile Grocers,grocery,low,Egypt
+M-002,Cairo Electronics,electronics,medium,Egypt
+M-003,Skyline Travel,travel,high,UAE
+M-004,Pixel Games,digital,high,USA
+M-005,City Fuel,fuel,low,Egypt
+M-006,Harbor Fashion,fashion,medium,Egypt
+M-007,Atlas Marketplace,marketplace,medium,UK
+M-008,Metro ATM,atm,low,Egypt
+M-009,Cloud Tools,software,medium,Germany
+M-010,Golden Restaurants,restaurant,low,Egypt
+M-011,Global Duty Free,travel,high,France
+M-012,Quick Digital,digital,high,USA

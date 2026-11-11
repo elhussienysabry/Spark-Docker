@@ -1,0 +1,11 @@
+hub_id,city,region,country,latitude,longitude
+HUB-CAI,Cairo,Cairo,Egypt,30.0444,31.2357
+HUB-ALX,Alexandria,Alexandria,Egypt,31.2001,29.9187
+HUB-GIZ,Giza,Cairo,Egypt,29.9792,31.1342
+HUB-MNS,Mansoura,Delta,Egypt,31.0409,31.3785
+HUB-ASW,Aswan,Upper Egypt,Egypt,24.0889,32.8998
+HUB-LXR,Luxor,Upper Egypt,Egypt,25.6872,32.6396
+HUB-DXB,Dubai,Gulf,UAE,25.2048,55.2708
+HUB-RUH,Riyadh,Gulf,KSA,24.7136,46.6753
+HUB-FRA,Frankfurt,Europe,Germany,50.1109,8.6821
+HUB-LHR,London,Europe,UK,51.5074,-0.1278

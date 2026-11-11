@@ -1,0 +1,9 @@
+tower_id,site_name,city,region,technology,capacity_mbps,latitude,longitude
+TWR-001,Cairo Downtown,Cairo,Cairo,5G,1200,30.0444,31.2357
+TWR-002,Giza Pyramids,Giza,Cairo,4G,700,29.9792,31.1342
+TWR-003,Alexandria Corniche,Alexandria,Alexandria,5G,900,31.2001,29.9187
+TWR-004,New Cairo,Cairo,Cairo,5G,1000,30.03,31.47
+TWR-005,Mansoura Center,Mansoura,Delta,4G,500,31.0409,31.3785
+TWR-006,Aswan Market,Aswan,Upper Egypt,4G,350,24.0889,32.8998
+TWR-007,Luxor West,Luxor,Upper Egypt,4G,300,25.6872,32.6396
+TWR-008,Suez Industrial,Suez,Canal,5G,800,29.9668,32.5498
