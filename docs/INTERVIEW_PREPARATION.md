@@ -150,11 +150,11 @@
 - **Detailed Answer**:
   - `repartition(N)`:
     - Performs a **full network shuffle** across all executors.
-    - Guarantees uniform partition sizes using RoundRobin or Hash partitioning.
+    - Redistributes rows across the requested partitions. Plain `repartition(N)` aims for balanced sizes; column-based `repartition(N, cols)` uses hashing and can still produce skew.
     - Can both **increase** and **decrease** the partition count.
     - **Use Cases**:
       1. When increasing parallelism (e.g. from 4 to 200 after reading a few large compressed files).
-      2. When eliminating severe data skew by redistributing rows evenly.
+      2. When spreading rows more evenly before a non-key-sensitive operation; repartitioning by a hot join key does not fix key skew.
       3. `repartition(N,'col')`: When partitioning by key prior to repeated joins or bucketed writes.
   - `coalesce(N)`:
     - **Avoids a full shuffle** by merging adjacent partitions on the same worker node.
@@ -234,9 +234,9 @@
 ### Q11. Why can a DataFrame query be faster than equivalent RDD operations?
 - **Detailed Answer**:
   1. **Catalyst Optimization**: DataFrames are declarative. Spark understands the semantics of the schema and operations. Catalyst can reorder filters, push predicates directly to Parquet row groups, and prune unused columns. RDD operations are opaque Python/Java function pointers (`lambda x: ...`) where Spark cannot inspect or optimize the logic.
-  2. **Tungsten Binary Memory Management**: DataFrames use Tungsten's `UnsafeRow` off-heap binary format. Data is stored in compact raw memory bytes without JVM object wrappers, avoiding Java object headers (16–24 bytes per object) and eliminating JVM Garbage Collection pressure.
-  3. **Whole-Stage Code Generation (WSCG)**: Tungsten synthesizes the entire query plan into a single clean Java bytecode loop, eliminating virtual function dispatch and keeping data in CPU L1/L2 registers.
-  4. **PySpark Serialization Overhead**: RDD transformations in PySpark require serializing data across a socket between the JVM and Python worker processes (`pickle`). DataFrames execute entirely inside the JVM via Tungsten; Python only receives the final result!
+  2. **Tungsten Binary Memory Management**: DataFrames use Tungsten's `UnsafeRow` binary row format, which stores fields in compact byte arrays using `Unsafe` access. It is often on-heap and can be configured off-heap; either way it reduces per-object overhead and can lower GC pressure, but it does not eliminate garbage collection.
+  3. **Whole-Stage Code Generation (WSCG)**: For supported operator chains, Tungsten generates a fused Java loop, reducing virtual dispatch and intermediate row materialization. It is cache-friendly rather than literally keeping all data in CPU registers, and not every operator supports codegen.
+  4. **PySpark Serialization Overhead**: RDD transformations in PySpark often serialize data between the JVM and Python worker processes. DataFrames execute their physical operators inside the JVM, but Python UDFs still cross the boundary, and the Python client still receives results through Py4J. The advantage is that native DataFrame operations avoid per-row Python serialization.
 
 ---
 
@@ -305,12 +305,12 @@
 ## 2. Fundamentals & Ecosystem (10 Questions)
 
 ### Q17. What is Apache Spark and why was it created?
-- **Answer**: Apache Spark is a multi-language, open-source, distributed general-purpose cluster-computing framework. It was created at UC Berkeley AMPLab in 2009 to overcome the architectural bottlenecks of Hadoop MapReduce—specifically MapReduce's mandatory materialization of intermediate results to disk between successive map and reduce jobs, which made iterative data processing (ML, graph algorithms, interactive queries) prohibitively slow. Spark introduced in-memory computing abstractions (RDDs) and DAG pipelining, delivering up to 100x faster performance.
+- **Answer**: Apache Spark is a multi-language, open-source, distributed general-purpose cluster-computing framework. It was created at UC Berkeley AMPLab in 2009 to overcome the architectural bottlenecks of Hadoop MapReduce—specifically MapReduce's mandatory materialization of intermediate results to disk between successive map and reduce jobs, which made iterative data processing (ML, graph algorithms, interactive queries) prohibitively slow. Spark introduced in-memory computing abstractions (RDDs) and DAG pipelining. Early benchmarks reported large speedups on some iterative workloads, but the multiplier is workload-dependent and should not be treated as a guarantee.
 - **Misconception**: Thinking Spark completely replaces Hadoop. Spark replaces MapReduce, but routinely runs on Hadoop YARN and reads from HDFS.
 
 ### Q18. Compare Apache Spark with Apache Flink.
 - **Answer**:
-  - **Spark**: Historically a batch-first engine. Streaming is implemented primarily as micro-batches (Structured Streaming), though continuous processing mode exists for sub-millisecond needs. Best-in-class batch ecosystem, SQL optimizer (Catalyst), and unified analytics.
+  - **Spark**: Historically a batch-first engine. Streaming is implemented primarily as micro-batches (Structured Streaming); continuous processing mode is an experimental low-latency option with limited operator support and weaker delivery guarantees. Strong batch ecosystem, SQL optimizer (Catalyst), and unified analytics.
   - **Flink**: True stream-first engine. Processes events record-by-record with native event-time processing and low-latency stateful streaming. Treats batch as a special case of streaming with bounded streams.
 - **Follow-up**:"When would you pick Flink over Spark?"->"For ultra-low-latency (<10ms) stateful stream processing with complex event processing (CEP)."
 
@@ -335,7 +335,7 @@
   1. You need fine-grained low-level control over physical data placement, custom partitioners, or memory buffers.
   2. You are processing unstructured, binary, or non-tabular data that cannot naturally fit a relational schema.
   3. You are maintaining legacy Spark 1.x codebases.
-  In 98% of modern Data Engineering tasks, DataFrames are strictly superior.
+  For most tabular ETL and analytics work, DataFrames are the better default because Catalyst and Tungsten can optimize the plan. RDDs remain useful for custom partitioning, unstructured data, and low-level control; "always use DataFrames" is too strong a rule.
 
 ### Q22. What is Spark Connect?
 - **Answer**: Introduced in Spark 3.4+, Spark Connect decouples the client from the Spark driver using a lightweight gRPC API. The client generates an unresolved logical plan and sends it over gRPC to a remote Spark Connect Server running on the cluster. This allows running PySpark from any IDE or serverless environment without requiring a local JVM installation.
@@ -472,7 +472,7 @@
   - `dense_rank()`: Identical rank for ties, does not skip numbers $	o [1, 1, 2]$.
 
 ### Q53. What is a Pandas UDF (Vectorized UDF)?
-- **Answer**: A user-defined function implemented with Python type hints and Apache Arrow. Instead of passing rows individually between JVM and Python workers, Spark transfers entire Apache Arrow batches directly into Pandas Series or DataFrames, achieving 10x–100x speedup over standard Python UDFs.
+- **Answer**: A user-defined function implemented with Python type hints and Apache Arrow. Instead of passing rows individually between JVM and Python workers, Spark transfers Apache Arrow batches into Pandas Series or DataFrames. This often reduces serialization and interpreter overhead substantially compared with row-at-a-time UDFs, but the speedup depends on the function, batch size, and data types.
 
 ### Q54. What happens when you register a Temporary View (`createOrReplaceTempView`)?
 - **Answer**: Spark registers the DataFrame's logical plan in the internal session catalog. It creates no physical data copies on disk or in memory; it simply assigns an alias enabling SQL queries via `spark.sql("SELECT * FROM view_name")`.
@@ -822,7 +822,7 @@
 - **Answer**: They produce $M 	imes N$ output rows, causing explosive data volume, disk thrashing, and job paralysis.
 
 ### Q141. How does Kryo serialization improve performance?
-- **Answer**: `org.apache.spark.serializer.KryoSerializer` is up to 10x faster and significantly more compact than standard Java serialization.
+- **Answer**: `org.apache.spark.serializer.KryoSerializer` often produces more compact serialized data and lower CPU cost than Java serialization, but the gain is workload-dependent. It also requires registering custom classes for best results and is not automatically compatible with every type.
 
 ### Q142. How does broadcast join eliminate shuffle?
 - **Answer**: The entire small table is sent to every executor once, allowing each worker to join local partitions independently without network transfer.

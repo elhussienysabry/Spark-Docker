@@ -121,7 +121,7 @@
 ### 21. Streaming Without Watermarks on Aggregations
 - **The Mistake**: Grouping by event time in Structured Streaming without defining `withWatermark()`.
 - **Why It's Wrong**: Spark maintains historical aggregate states indefinitely, eventually crashing with an OOM.
-- **Correct Approach**: Always provide a watermark: `df.withWatermark("timestamp","10 minutes")`.
+- **Correct Approach**: For event-time aggregations, provide a watermark sized to the measured lateness tolerance, for example `df.withWatermark("timestamp", "10 minutes")`. If the query genuinely needs unbounded state, make that an explicit, monitored design decision rather than an accidental default.
 
 ### 22. Changing Streaming Query Schema Without Changing Checkpoint Directory
 - **The Mistake**: Modifying streaming query logic or schema while pointing to an existing checkpoint directory.
@@ -130,7 +130,7 @@
 
 ### 23. Storing Checkpoints on Ephemeral Disks
 - **The Mistake**: Pointing checkpoint location to `/tmp` in container storage.
-- **Why It's Wrong**: If the container restarts, all checkpoint state is wiped out, destroying exactly-once guarantees.
+- **Why It's Wrong**: If the container restarts, checkpoint state and offsets are lost, so the query cannot resume reliably. This destroys recovery and the checkpoint's contribution to exactly-once; the sink may also replay data, so end-to-end correctness depends on idempotent or transactional writes.
 - **Correct Approach**: Use durable persistent storage (HDFS, S3, or mounted persistent volumes).
 
 ### 24. Reading Kafka from `earliest` in Production Without Checkpoints
