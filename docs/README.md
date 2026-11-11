@@ -36,6 +36,7 @@ index to go deeper.
 
 | Guide | What it covers |
 |---|---|
+| [Datasets](DATASETS.md) | Dataset inventory, container paths, record counts, and regeneration commands |
 | [Spark architecture](SPARK_ARCHITECTURE.md) | Memory layouts, execution lifecycle, RPCs, shuffle mechanics, schedulers |
 | [Interview preparation](INTERVIEW_PREPARATION.md) | 158 questions across junior, mid, senior, and staff levels |
 | [Common mistakes](COMMON_MISTAKES.md) | Production antipatterns with before/after fixes |
