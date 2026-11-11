@@ -149,11 +149,14 @@ services:
     environment:
       JUPYTER_TOKEN: ${JUPYTER_TOKEN:-spark}
       SPARK_MASTER: spark://spark-master:7077
+      # Use the same read-only Spark defaults as the cluster daemons.
+      SPARK_CONF_DIR: /opt/spark-conf
       # Make the PySpark bundled with SPARK_HOME importable by the Jupyter kernel.
       PYTHONPATH: /usr/local/spark/python:/usr/local/spark/python/lib/py4j-0.10.9.9-src.zip
       TZ: ${TZ:-Africa/Cairo}
     volumes:
       - ./notebooks:/home/jovyan/work:rw,z
+      - ./conf:/opt/spark-conf:ro,z
       - ./apps:/opt/spark-apps:ro,z
       - ./data:/opt/spark-data:rw,z
       - ./events:/opt/spark-events:rw,z
