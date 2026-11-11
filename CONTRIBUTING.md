@@ -57,12 +57,18 @@ Before committing changes to any notebook or script, run the automated validatio
 python3 scripts/validate_notebooks.py
 ```
 
-The validator verifies:
-- JSON format integrity across all Jupyter notebooks.
+The validation suite verifies:
+- JSON structure and required fields across all Jupyter notebooks.
 - Python syntax correctness in every code cell via Abstract Syntax Tree (AST) parsing.
-- Prevention of broken imports, unescaped characters, or malformed cell metadata.
+- Notebook and cell metadata sanity, including duplicate cell IDs.
+- Relative links in README, docs, and notebook Markdown cells.
 
-All pull requests must pass this validation check without errors.
+All pull requests must pass the notebook validator and the link checker without errors:
+
+```bash
+python3 scripts/validate_notebooks.py
+python3 scripts/check_links.py
+```
 
 ### 3. Writing and Formatting Guidelines
 

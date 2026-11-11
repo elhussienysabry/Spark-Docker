@@ -3,7 +3,7 @@ SPARK_MASTER ?= spark://spark-master:7077
 SPARK_SUBMIT = $(COMPOSE) exec spark-master /opt/spark/bin/spark-submit --master $(SPARK_MASTER)
 
 .PHONY: help up down restart ps logs master-ui history-ui jupyter-url \
-        shell pyspark sql submit pi wordcount sales test clean-output
+        shell pyspark sql submit pi wordcount sales test validate clean-output
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -57,6 +57,10 @@ sales: ## Run the sales report job
 
 test: pi wordcount sales ## Run all three sample jobs
 	@echo "All sample jobs finished. Check http://localhost:18080"
+
+validate: ## Validate notebook JSON/AST and local Markdown links
+	python3 scripts/validate_notebooks.py
+	python3 scripts/check_links.py
 
 clean-output: ## Delete generated outputs and event logs (keeps source data)
 	docker compose run --rm --no-deps --user root --entrypoint /bin/bash spark-master -c \

@@ -12,6 +12,7 @@ Fixes # (issue)
 
 ## Validation Checklist
 - [ ] I have executed `python scripts/validate_notebooks.py` and all notebooks pass syntax and JSON validation.
+- [ ] I have executed `python scripts/check_links.py` and all local links resolve.
 - [ ] I have tested the notebooks against the local Docker Spark cluster.
 - [ ] I have verified that no emojis were introduced into markdown or notebook text.
 - [ ] I have confirmed that no generated runtime files (event logs, warehouse outputs, pycache) are staged.
