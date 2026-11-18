@@ -79,7 +79,7 @@ def write_topic_index() -> None:
         "> `scripts/generate_navigation_docs.py`. Edit the metadata, not this table, then re-run",
         "> the generator.",
         "",
-        "This index covers the 76 core curriculum notebooks. The four business case studies are",
+        "This index covers the 77 core curriculum notebooks. The four business case studies are",
         "indexed separately in [CASE_STUDIES.md](CASE_STUDIES.md); their business context is in",
         "[BUSINESS_CONTEXT.md](BUSINESS_CONTEXT.md).",
         "",

@@ -11,7 +11,7 @@ index to go deeper.
 | [Topic index](TOPIC_INDEX.md) | Every core notebook with priority, effort, prerequisites, and experiment |
 | [Priority guide](PRIORITY_GUIDE.md) | Role-specific depth: what to learn deeply and what to postpone |
 | [Notebook template](NOTEBOOK_TEMPLATE.md) | The A–L structure and quality checklist for new notebooks |
-| [Real-world use cases](USE_CASES.md) | Topic-specific scenarios mapped to all 76 core notebooks |
+| [Real-world use cases](USE_CASES.md) | Topic-specific scenarios mapped to all 77 core notebooks |
 | [Business context](BUSINESS_CONTEXT.md) | How Spark fits into a data platform, and when another tool is better |
 
 ## Case studies

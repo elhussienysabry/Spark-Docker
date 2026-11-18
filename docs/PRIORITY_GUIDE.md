@@ -47,6 +47,7 @@ This guide provides an uncompromising, role-specific roadmap detailing:
 | **Spark UI & Event Log Diagnostics** | Critical | Critical | Medium | Critical |
 | **Cluster Modes (Client vs Cluster)** | High | Critical | Low | Critical |
 | **Spark Connect Architecture** | Medium | High | Medium | High |
+| **Graph Processing (GraphX / GraphFrames)** | Medium | High | Low | Medium |
 
 ---
 
@@ -416,6 +417,30 @@ This guide provides an uncompromising, role-specific roadmap detailing:
   - `09_streaming/02_structured_streaming.ipynb`
   - `09_streaming/04_watermarks_and_late_data.ipynb`
   - `09_streaming/05_checkpoints_and_fault_tolerance.ipynb`
+
+### 16. Graph Processing with Spark
+- **Priority**: Medium (DE) · High (Sr. DE) · Low (AE) · Medium (Platform)
+- **Required Depth**: Working Knowledge to Deep Internals
+- **What You MUST Understand**:
+  - A graph is a **vertex DataFrame** keyed by a unique `id` and an **edge DataFrame** with `src` and `dst` keys.
+  - Degree, connected components, BFS, and PageRank are iterative joins and aggregations; each round shuffles state by vertex id.
+  - **Pregel** is the vertex-centric superstep model: receive messages, update state, send messages.
+  - **Dangling nodes** have no outgoing edges; PageRank must redistribute their mass or total rank drifts below 1.0.
+  - **Supernodes** are high-degree vertices that skew one shuffle partition and one task.
+  - **GraphX** is a Scala/RDD API; **GraphFrames** is a separate DataFrame package. Neither is a core PySpark dependency.
+- **What You Should Implement**:
+  - Build vertices and edges from existing tables and compute in/out degree.
+  - Implement connected components and BFS with `left_anti` joins and a convergence check.
+  - Implement PageRank with damping, dangling-mass redistribution, and `localCheckpoint`.
+  - Add a hub vertex and inspect the skewed stage in the Spark UI.
+- **What You Should Explain in an Interview**:
+  - "Spark does not need a special graph API for every problem: vertices and edges are DataFrames, and each iteration is a join plus an aggregation. The hard parts are convergence, shuffle cost, skew, and lineage growth."
+  - "I would use DataFrame iteration for a bounded teaching or feature pipeline, GraphFrames when I need a maintained graph library, and a graph database when low-latency traversal or interactive queries are the product."
+- **What You Can Postpone**:
+  - GraphX internals and custom Pregel implementations in Scala.
+  - Distributed graph embeddings and specialized graph neural network infrastructure.
+- **Related Notebooks**:
+  - `12_advanced_topics/07_graph_processing.ipynb`
 
 ---
 

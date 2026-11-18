@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A self-contained Apache Spark 4.2.1 lab that runs a real standalone cluster in Docker and
-teaches distributed data engineering through 80 curriculum notebooks, from fundamentals to
+teaches distributed data engineering through 81 curriculum notebooks, from fundamentals to
 production-style case studies.
 
 The stack includes a Spark master, two workers, a Spark History Server, and JupyterLab.
@@ -16,12 +16,14 @@ Everything runs locally and starts with one command.
 
 - **Real distributed cluster** — one master and two workers, with live Spark UIs, event
   logs, and post-run history.
-- **80 curriculum notebooks** — 76 core topics across 14 modules plus four end-to-end
+- **81 curriculum notebooks** — 77 core topics across 14 modules plus four end-to-end
   business case studies.
 - **Hands-on throughout** — runnable examples, controlled experiments, production failure
   modes, and interview questions in every core topic.
 - **Observable internals** — inspect DAGs, shuffle files, memory spills, task retries, and
   executor loss rather than only reading about them.
+- **Advanced coverage** — execution internals, memory and shuffle tuning, fault tolerance,
+  deployment, graph processing, and PySpark internals.
 - **Deterministic datasets** — synthetic retail, log, streaming, telecom, fraud, and
   logistics data that regenerate identically.
 - **Automated checks** — notebook JSON/AST validation and local link checking in CI.
@@ -69,7 +71,7 @@ to verify driver-worker communication. `make help` lists the available shortcuts
 
 ```text
 .
-├── notebooks/      # 80 curriculum notebooks, two quickstarts, and a template
+├── notebooks/      # 81 curriculum notebooks, two quickstarts, and a template
 ├── apps/           # sample spark-submit jobs
 ├── data/           # deterministic synthetic datasets
 ├── docs/           # guides, roadmap, architecture, and case-study notes
@@ -90,7 +92,7 @@ The curriculum is organized as `notebooks/00_environment_and_spark_setup/` throu
 | Guide | What it covers |
 | :--- | :--- |
 | [Learning roadmap](docs/LEARNING_ROADMAP.md) | 12-week path from setup to production, with milestones and role paths |
-| [Topic index](docs/TOPIC_INDEX.md) | All 76 core topics with priority, effort, prerequisites, and experiments |
+| [Topic index](docs/TOPIC_INDEX.md) | All 77 core topics with priority, effort, prerequisites, and experiments |
 | [Case studies](docs/CASE_STUDIES.md) | Four runnable end-to-end projects: e-commerce, telecom, fraud, and logistics |
 | [Datasets](docs/DATASETS.md) | Dataset inventory, container paths, and regeneration commands |
 | [Spark architecture](docs/SPARK_ARCHITECTURE.md) | Execution lifecycle, memory layout, networking, and schedulers |

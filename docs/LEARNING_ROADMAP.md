@@ -414,7 +414,8 @@ The complete reference matrix — use this to look up any topic quickly.
 | 43 | End-to-End ETL Project | Essential | 3 h | #29, #11, #13 | `13_end_to_end_projects/` | Full pipeline design |
 | 44 | End-to-End Streaming Project | Important | 3 h | #32, #33 | `13_end_to_end_projects/` | Streaming pipeline design |
 | 45 | Advanced Configurations | Advanced | 2 h | #21, #41 | `12_advanced_topics/` | Tuning configs, serialization |
-| 46 | Business Case Studies | Important | 12–16 h | #11, #13, #29, #32 | `14_business_case_studies/` | Grain, metric definitions, quality, production trade-offs |
+| 46 | Graph Processing | Advanced | 3–4 h | #11, #17, #19 | `12_advanced_topics/` | Vertices, edges, connected components, BFS, PageRank, iteration |
+| 47 | Business Case Studies | Important | 12–16 h | #11, #13, #29, #32 | `14_business_case_studies/` | Grain, metric definitions, quality, production trade-offs |
 
 ---
 
@@ -562,6 +563,7 @@ assignment. Role focus is a shorthand: **DE** = data engineer, **Senior** = seni
 | [`04_resource_allocation`](../notebooks/12_advanced_topics/04_resource_allocation.ipynb) | Important | 3–4 h | Executor sizing, cluster resources, memory overhead | Compare executor shapes | DE + Senior |
 | [`05_spark_connect`](../notebooks/12_advanced_topics/05_spark_connect.ipynb) | Advanced | 2–3 h | SparkSession, client/server architecture, gRPC | Connect to a remote server | Senior + Specialist |
 | [`06_pyspark_internals`](../notebooks/12_advanced_topics/06_pyspark_internals.ipynb) | Advanced | 3–4 h | PySpark basics, JVM, serialization | Compare UDF styles | Senior + Specialist |
+| [`07_graph_processing`](../notebooks/12_advanced_topics/07_graph_processing.ipynb) | Advanced | 3–4 h | DataFrames, joins, aggregations, Spark UI, iterative jobs | Compare PageRank after 1 and 20 iterations | Senior + Specialist |
 
 ### Module 13 — End-to-end projects
 
@@ -1023,4 +1025,4 @@ depth you didn't see before. After completing this 12-week roadmap:
 
 ---
 
-*Last updated: 2026-11-09 | Spark Version: 4.2.1 | PySpark: 4.2.1*
+*Last updated: 2026-11-18 | Spark Version: 4.2.1 | PySpark: 4.2.1*

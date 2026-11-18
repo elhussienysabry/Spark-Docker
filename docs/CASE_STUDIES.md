@@ -519,7 +519,7 @@ their own row counts, metrics, and plans so a reader can compare results.
 
 - Read [BUSINESS_CONTEXT.md](BUSINESS_CONTEXT.md) for how Spark fits into a data platform,
   including batch vs streaming, economics, reliability, and security.
-- Read [USE_CASES.md](USE_CASES.md) for topic-specific scenarios across all 76 core
+- Read [USE_CASES.md](USE_CASES.md) for topic-specific scenarios across all 77 core
   notebooks.
 - Use [TOPIC_INDEX.md](TOPIC_INDEX.md) to find the prerequisite notebook for a pattern used
   here.

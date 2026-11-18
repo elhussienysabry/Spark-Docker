@@ -4,7 +4,7 @@
 > `scripts/generate_navigation_docs.py`. Edit the metadata, not this table, then re-run
 > the generator.
 
-This index covers the 76 core curriculum notebooks. The four business case studies are
+This index covers the 77 core curriculum notebooks. The four business case studies are
 indexed separately in [CASE_STUDIES.md](CASE_STUDIES.md); their business context is in
 [BUSINESS_CONTEXT.md](BUSINESS_CONTEXT.md).
 
@@ -170,6 +170,7 @@ indexed separately in [CASE_STUDIES.md](CASE_STUDIES.md); their business context
 | [Resource Allocation: Cores, Memory, and Executor Sizing Formula](../notebooks/12_advanced_topics/04_resource_allocation.ipynb) | Important | 3–4 h | Executor sizing, cluster resources, memory overhead | Compare executor shapes |
 | [Spark Connect: Thin Client Architecture and Decoupled Execution](../notebooks/12_advanced_topics/05_spark_connect.ipynb) | Advanced | 2–3 h | SparkSession, client/server architecture, gRPC | Connect to a remote server |
 | [PySpark Internals: Py4J Bridge, Python Daemons, and Serialization Overhead](../notebooks/12_advanced_topics/06_pyspark_internals.ipynb) | Advanced | 3–4 h | PySpark basics, JVM, serialization | Compare UDF styles |
+| [Graph Processing: Relationships, Traversal, and Iterative Algorithms](../notebooks/12_advanced_topics/07_graph_processing.ipynb) | Advanced | 3–4 h | DataFrames, joins, aggregations, Spark UI, iterative jobs | Convergence of iterative PageRank |
 
 ## Module 13 — End-to-end projects
 
