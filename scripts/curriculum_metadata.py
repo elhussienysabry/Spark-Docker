@@ -7547,6 +7547,128 @@ why a few lines of Python can dominate a job.""",
         ("Why are Python UDFs slower than native expressions?", "They cross the JVM/Python boundary, require serialization, and prevent whole-stage codegen for the expression."),
         ("What is a pandas UDF?", "A vectorized Python UDF that receives a pandas Series/DataFrame batch and uses Arrow to exchange data, reducing per-row overhead."),
     ],
+    "`12_advanced_topics/07_graph_processing.ipynb`",
+)
+
+TOPICS["12_advanced_topics/07_graph_processing.ipynb"] = topic(
+    "Advanced",
+    "3–4 h",
+    "DataFrames, joins, aggregations, Spark UI, iterative jobs",
+    "Deep working knowledge: can model a graph, implement an iterative algorithm, and diagnose its shuffle and lineage cost",
+    {
+        "de": "Build graph features and entity-resolution pipelines with DataFrame joins.",
+        "senior": "Choose between DataFrame iteration, GraphFrames, GraphX, and a dedicated graph system.",
+        "specialist": "Reason about Pregel-style iteration, checkpointing, shuffle skew, and supernode handling.",
+    },
+    """Relationships are often the most valuable part of a dataset: who transacts with whom, which accounts
+share a device, which services depend on each other. Spark does not ship a Python graph library in the core
+distribution. GraphX is a Scala/RDD API, and GraphFrames is a separate package. You can still express many
+graph algorithms with vertices and edges as DataFrames and repeated joins, but the iteration changes the cost
+profile: every round shuffles state by vertex id, long lineages grow, and a single high-degree vertex can
+dominate a partition.""",
+    [
+        ("Vertex", "An entity", "A row in the vertex DataFrame with a unique id and attributes"),
+        ("Edge", "A relationship", "A row with `src`, `dst`, and optional weight or attributes"),
+        ("Degree", "Number of connections", "In-degree counts incoming edges; out-degree counts outgoing edges"),
+        ("Connected component", "A group of reachable vertices", "A label propagated across undirected edges until stable"),
+        ("BFS", "Shortest path in an unweighted graph", "Frontier expansion one hop per iteration"),
+        ("PageRank", "A recursive importance score", "Rank flows along outgoing edges with damping and dangling-mass redistribution"),
+        ("Pregel", "Vertex-centric iteration", "Each vertex receives messages, updates state, and sends messages in supersteps"),
+        ("Supernode", "A very high-degree vertex", "A key that skews one shuffle partition and one task"),
+    ],
+    [
+        "Represent entities as a vertex DataFrame keyed by a unique id.",
+        "Represent relationships as an edge DataFrame with `src` and `dst` keys.",
+        "Each iteration joins the current state to the edges, shuffles by vertex id, and aggregates messages.",
+        "Connected components propagates the minimum label; BFS propagates the minimum distance; PageRank propagates rank mass.",
+        "`localCheckpoint` or `checkpoint` truncates the growing logical plan between iterations.",
+        "Convergence is a business decision: stop when labels stop changing, the frontier is empty, or rank deltas fall below a tolerance.",
+    ],
+    [
+        uc(
+            "Fraud-ring detection",
+            "Financial services",
+            "Analysts need to find groups of accounts that share devices, cards, or addresses and may be part of the same fraud ring.",
+            "Looking at one account at a time hides the shared identifiers that connect a ring.",
+            "Connected components over shared-identifier edges collapse each ring into one reviewable group.",
+            "Build vertices for accounts and identifiers, add edges for each observed link, propagate component labels, and rank components by size and risk.",
+            "A short list of connected groups for manual review, with the shared identifiers preserved as evidence.",
+            "A graph database with native traversal.",
+            "A DataFrame implementation keeps the pipeline in Spark but requires checkpointing and careful handling of high-degree identifiers.",
+        ),
+        uc(
+            "Social recommendation",
+            "Media and social platforms",
+            "A product team wants to rank accounts by influence in a follow graph and recommend who to follow next.",
+            "Raw follower counts reward already-famous accounts and ignore where attention flows through the network.",
+            "PageRank or degree-based features capture both direct and indirect importance, and can be joined to candidate recommendations.",
+            "Build a directed follow graph, run PageRank for a bounded number of iterations, and join the scores to candidate pairs.",
+            "A ranked candidate list with an explainable network feature.",
+            "A dedicated graph engine or a feature store with precomputed graph embeddings.",
+            "Iterative DataFrame PageRank is transparent and dependency-free, but repeated full-graph runs are expensive at very large scale.",
+        ),
+        uc(
+            "Identity resolution",
+            "Marketing and customer data",
+            "Customer records arrive from multiple systems with different ids, emails, phones, and device identifiers.",
+            "Duplicate profiles inflate counts and split the customer journey across records.",
+            "Connected components over matching identifiers produce a canonical entity id for each cluster.",
+            "Normalize identifiers, create edges for exact or probabilistic matches, propagate component labels, and persist the mapping.",
+            "A canonical id mapping that downstream marts can join to.",
+            "A master data management platform or a specialized entity-resolution tool.",
+            "A Spark pipeline is flexible and auditable, but probabilistic matching needs threshold tuning and human review.",
+        ),
+    ],
+    [
+        "Finds fraud rings and shared-identity clusters that row-level rules miss.",
+        "Improves recommendation and influence features with network structure.",
+        "Reduces duplicate customer records and inconsistent reporting.",
+        "Makes the cost of iterative graph processing visible before committing to a platform.",
+        "Provides a dependency-free baseline before adopting GraphFrames, GraphX, or a graph database.",
+    ],
+    [
+        "Bound iterations and define a convergence tolerance; do not loop forever.",
+        "Checkpoint long iterative plans to truncate lineage.",
+        "Use `localCheckpoint` for fast lineage truncation and reliable `checkpoint()` when recovery across executor loss matters.",
+        "Partition or salt high-degree vertices to reduce shuffle skew.",
+        "Redistribute dangling-node mass in PageRank and verify that scores sum to approximately 1.0.",
+        "Measure shuffle read/write, task duration skew, and checkpoint I/O for every extra round.",
+        "Use GraphFrames, GraphX, or a dedicated graph system when the algorithm or scale justifies the dependency.",
+    ],
+    {
+        "advantages": ["Uses the existing DataFrame API and cluster", "No extra runtime dependency", "Easy to inspect plans and intermediate state"],
+        "limitations": ["Iterative joins are expensive", "No built-in graph algorithms in PySpark", "Supernodes cause skew", "Convergence and correctness are your responsibility"],
+        "use": ["Entity resolution", "Fraud rings", "Dependency analysis", "Moderate-size graphs"],
+        "avoid": ["Billion-edge low-latency traversal", "Algorithms that need a specialized graph engine", "Repeated interactive graph queries"],
+        "inside": ["DataFrame iterative joins", "GraphX (Scala/RDD)", "GraphFrames (separate package)"],
+        "outside": ["Neo4j", "Amazon Neptune", "TigerGraph", "NetworkX for single-node graphs"],
+    },
+    {
+        "title": "Convergence of iterative PageRank",
+        "steps": [
+            "Run PageRank for one iteration and for 20 iterations.",
+            "Compare the per-node ranks and the largest absolute change.",
+            "Check that the 20-iteration ranks sum to approximately 1.0.",
+        ],
+        "observe": "One iteration ranks nodes mostly by direct incoming links; later iterations move mass through longer paths and the 4-5-6 cycle.",
+        "healthy": "Ranks stabilize and sum to about 1.0; the largest change between 1 and 20 iterations is about 0.107 on this graph.",
+        "problem": "Ranks keep moving, the sum drifts from 1.0, or the job slows because the plan grows.",
+        "takeaway": "Pick a convergence tolerance, checkpoint each iteration, and measure the cost of every extra round.",
+    },
+    {
+        "title": "Connected components never converge",
+        "scenario": "A connected-components job keeps running, and the Spark UI shows one task processing far more shuffle data than the others.",
+        "hints": [
+            "Check whether the graph is directed and whether edges are mirrored before propagation.",
+            "Look for a high-degree vertex and inspect partition sizes.",
+            "Verify that each iteration truncates lineage and that the convergence condition is reachable.",
+        ],
+    },
+    [
+        ("How would you represent a graph in Spark?", "As a vertex DataFrame keyed by id and an edge DataFrame with src and dst. Algorithms join state to edges and aggregate messages, iterating until convergence."),
+        ("What is the Pregel model, and how does it map to Spark?", "Pregel is vertex-centric iteration in supersteps: each vertex receives messages, updates its state, and sends messages to neighbors. In Spark, each superstep is a join and aggregation; GraphX implements it directly, while DataFrame code emulates it."),
+        ("Why can PageRank fail on a graph with dangling nodes?", "Dangling vertices have no outgoing edges, so their rank is never propagated. Without redistributing that mass, total rank drifts below 1.0 and the scores are biased."),
+    ],
     "`13_end_to_end_projects/01_batch_etl_pipeline.ipynb`",
 )
 
